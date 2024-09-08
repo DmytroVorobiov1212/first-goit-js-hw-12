@@ -6,6 +6,7 @@ import { getSearch } from "./js/pixabay-api";
 import { createMarkup } from "./js/render-functions";
 import refs from "./js/refs";
 const { form, gallery, loader, loadMore } = refs;
+import { scrollingTopPage } from "./js/scrollTop";
 
 let saveQuery = '';
 let currentPage = 1;
@@ -17,6 +18,8 @@ loadMore.classList.add('hidden');
 
 form.addEventListener('submit', onSearch);
 loadMore.addEventListener('click', loadBtn);
+
+scrollingTopPage();
 
 function onSearch(evt) {
     evt.preventDefault()
@@ -44,8 +47,6 @@ function onSearch(evt) {
 
             gallery.insertAdjacentHTML("beforeend", createMarkup(resp.data.hits));
             loadMore.classList.remove('hidden');
-
-            console.log(resp.data.totalHits);
             
             if (currentPage * perPage >= resp.data.totalHits) {
                 loadMore.classList.add('hidden');
@@ -99,38 +100,8 @@ function loadBtn() {
                 title: 'Caution',
                 message: `We're sorry, but you've reached the end of search results.`,
             }),
-            loadMore.classList.add('hidden');
+                loadMore.classList.add('hidden');
         }
     })
 
 }
-
-
-
-function scrollingTopPage() {
-    document.addEventListener('DOMContentLoaded', function () {
-        const upButton = document.querySelector('.up-btn');
-
-        upButton.addEventListener('click', function () {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-
-            document.body.classList.add('scrolling');
-        });
-
-        window.addEventListener('scroll', function () {
-            if (window.scrollY > 200) {
-                upButton.classList.add('show');
-            } else {
-                upButton.classList.remove('show');
-            }
-
-            if (document.body.classList.contains('scrolling') && window.scrollY === 0) {
-                document.body.classList.remove('scrolling');
-            }
-        });
-    });
-}
-scrollingTopPage();

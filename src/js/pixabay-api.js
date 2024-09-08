@@ -13,14 +13,6 @@ export async function getSearch(searchText, currentPage) {
         if (searchText.includes(' ')) {
             searchText.replace(/\s+/g, '+');
         }
-        // if (!resp.data.hits.length) {
-        //     throw new Error(
-        //         iziToast.error({
-        //             message: 'Sorry, there are no images matching your search query. Please try again!',
-        //         })
-        //     );
-        // }
-        
         const response = await axios.get(`${BASE_URL}`, {
             params: {
                 key: KEY,
