@@ -33,6 +33,7 @@ function onSearch(evt) {
             message: 'Please enter search text!',
         }),
             loader.style.display = 'none',
+            loadMore.classList.add('hidden'),
             form.reset()
     }
 
