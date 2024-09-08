@@ -1,1 +1,1 @@
-export default { form: document.querySelector('.js-form'), gallery: document.querySelector('.js-gallery'), loader: document.querySelector('.loader') };
+export default { form: document.querySelector('.js-form'), gallery: document.querySelector('.js-gallery'), loader: document.querySelector('.loader'), loadMore: document.querySelector('.load-more') };
