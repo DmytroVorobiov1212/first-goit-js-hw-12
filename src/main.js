@@ -7,11 +7,14 @@ import { createMarkup } from "./js/render-functions";
 import refs from "./js/refs";
 const { form, gallery, loader, loadMore } = refs;
 import { scrollingTopPage } from "./js/scrollTop";
+// import { checkCard } from "./js/animatedCard";
+// const boxes = document.querySelectorAll('.gallery-item');
 
 let saveQuery = '';
 let currentPage = 1;
 const perPage = 15;
 let refreshPage;
+let animItems;
 
 loader.style.display = 'none';
 loadMore.classList.add('hidden');
@@ -23,7 +26,6 @@ scrollingTopPage();
 
 function onSearch(evt) {
     evt.preventDefault()
-
     currentPage = 1;
     gallery.innerHTML = '';
     loader.style.display = 'block';
@@ -46,8 +48,44 @@ function onSearch(evt) {
 
 
             gallery.insertAdjacentHTML("beforeend", createMarkup(resp.data.hits));
+            ////////////
+            animItems = document.querySelectorAll('.gallery-item');
+
+            if (animItems.length > 0) {
+                window.addEventListener('scroll', animOnScroll)
+                function animOnScroll() {
+                    for (let index = 0; index < animItems.length; index++) {
+                        const animItem = animItems[index];
+                        const animItemHeight = animItem.offsetHeight
+                        const animItemOffset = offset(animItem).top;
+                        const animStart = 2;
+
+                        let animItemPoint = window.innerHeight - animItemHeight / animStart;
+
+                        if (animItemHeight > window.innerHeight) {
+                            animItemPoint = window.innerHeight - window.innerHeight / animStart;
+                        }
+
+                        if ((pageYOffset > animItemOffset - animItemPoint) && pageYOffset < (animItemOffset + animItemHeight)) {
+                            animItem.classList.add('show');
+                        } else {
+                            animItem.classList.remove('show')
+                        }
+                    }
+                }
+                function offset(el) {
+                    const rect = el.getBoundingClientRect(),
+                        scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+                        scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+                }
+                animOnScroll()
+            }
+
+            //////////////
             loadMore.classList.remove('hidden');
             
+
             if (currentPage * perPage >= resp.data.totalHits) {
                 loadMore.classList.add('hidden');
             }
@@ -88,6 +126,42 @@ function loadBtn() {
 
     getSearch(saveQuery, currentPage).then(resp => {
         gallery.insertAdjacentHTML("beforeend", createMarkup(resp.data.hits));
+
+        ///////////
+
+        animItems = document.querySelectorAll('.gallery-item');
+        if (animItems.length > 0) {
+            window.addEventListener('scroll', animOnScroll)
+            function animOnScroll() {
+                for (let index = 0; index < animItems.length; index++) {
+                    const animItem = animItems[index];
+                    const animItemHeight = animItem.offsetHeight
+                    const animItemOffset = offset(animItem).top;
+                    const animStart = 4;
+
+                    let animItemPoint = window.innerHeight - animItemHeight / animStart;
+
+                    if (animItemHeight > window.innerHeight) {
+                        animItemPoint = window.innerHeight - window.innerHeight / animStart;
+                    }
+
+                    if ((pageYOffset > animItemOffset - animItemPoint) && pageYOffset < (animItemOffset + animItemHeight)) {
+                        animItem.classList.add('show');
+                    } else {
+                        animItem.classList.remove('show')
+                    }
+                }
+            }
+            function offset(el) {
+                const rect = el.getBoundingClientRect(),
+                    scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+                    scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+            }
+            animOnScroll()
+        }
+
+        //////////
         window.scrollBy({
             top: getHeightImgCard().height * 2,
             left: 0,
@@ -105,3 +179,35 @@ function loadBtn() {
     })
 
 }
+
+// animItems = document.querySelectorAll('.gallery-item');
+// if (animItems.length > 0) {
+//     window.addEventListener('scroll', animOnScroll)
+//     function animOnScroll() {
+//         for (let index = 0; index < animItems.length; index++) {
+//             const animItem = animItems[index];
+//             const animItemHeight = animItem.offsetHeight
+//             const animItemOffset = offset(animItem).top;
+//             const animStart = 4;
+
+//             let animItemPoint = window.innerHeight - animItemHeight / animStart;
+
+//             if (animItemHeight > window.innerHeight) {
+//                 animItemPoint = window.innerHeight - window.innerHeight / animStart;
+//             }
+
+//             if ((pageYOffset > animItemOffset - animItemPoint) && pageYOffset < (animItemOffset + animItemHeight)) {
+//                 animItem.classList.add('show');
+//             } else {
+//                 animItem.classList.remove('show')
+//             }
+//         }
+//     }
+//     function offset(el) {
+//         const rect = el.getBoundingClientRect(),
+//             scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+//             scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+//         return {top:rect.top + scrollTop, left:rect.left +scrollLeft}
+//     }
+//     animOnScroll()
+// }
