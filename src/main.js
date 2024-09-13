@@ -5,8 +5,9 @@ import "izitoast/dist/css/iziToast.min.css";
 import { getSearch } from "./js/pixabay-api";
 import { createMarkup } from "./js/render-functions";
 import refs from "./js/refs";
-const { form, gallery, loader} = refs;
+const { form, gallery, loader, result, resultSpan } = refs;
 import { scrollingTopPage } from "./js/scrollTop";
+
 
 let saveQuery = '';
 let currentPage = 1;
@@ -15,6 +16,7 @@ let refreshPage;
 let animItems;
 
 loader.style.display = 'none';
+result.style.display = 'none';
 
 form.addEventListener('submit', onSearch);
 
@@ -22,30 +24,14 @@ scrollingTopPage();
 
 function animOnScroll() {
     if (!animItems) return;
+    const triger = window.innerHeight + 100;
     for (let index = 0; index < animItems.length; index++) {
         const animItem = animItems[index];
-        const animItemHeight = animItem.offsetHeight
-        const animItemOffset = offset(animItem).top;
-        const animStart = 9;
-
-        let animItemPoint = window.innerHeight - animItemHeight / animStart;
-
-        if (animItemHeight > window.innerHeight) {
-            animItemPoint = window.innerHeight - window.innerHeight / animStart;
-        }
-
-        if ((pageYOffset > animItemOffset - animItemPoint) && pageYOffset < (animItemOffset + animItemHeight)) {
+        const topOfBoxes = animItem.getBoundingClientRect().top;
+        if (topOfBoxes < triger) {
             animItem.classList.add('show');
-        } else {
-            animItem.classList.remove('show')
         }
     }
-}
-function offset(el) {
-    const rect = el.getBoundingClientRect(),
-        scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
-        scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
 }
 
 window.addEventListener('scroll', animOnScroll);
@@ -55,6 +41,7 @@ function onSearch(evt) {
     currentPage = 1;
     gallery.innerHTML = '';
     loader.style.display = 'block';
+    
     saveQuery = evt.target.elements.query.value.trim();
 
     window.addEventListener('scroll', infiniteScroll);
@@ -65,15 +52,16 @@ function onSearch(evt) {
             message: 'Please enter search text!',
         }),
             loader.style.display = 'none',
-            // loadMore.classList.add('hidden'),
+            result.style.display = 'none',
             form.reset()
     }
 
 
     getSearch(saveQuery, currentPage)
         .then(resp => {
-
-
+            result.style.display = 'block';
+            resultSpan.textContent = `${resp.data.totalHits}`;
+            
             gallery.insertAdjacentHTML("beforeend", createMarkup(resp.data.hits));
 
             animItems = document.querySelectorAll('.gallery-item');
@@ -84,7 +72,8 @@ function onSearch(evt) {
                     title: 'Error',
                     message: 'Sorry, there are no images matching your search query. Please try again!',
                 }),
-                    loader.style.display = 'none';
+                    loader.style.display = 'none',
+                    result.style.display = 'none';
                 return;
             }
 
